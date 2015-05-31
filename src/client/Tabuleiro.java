@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -19,29 +20,116 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.border.LineBorder;
 
+import server.Piece;
+import server.Server;
+
 public class Tabuleiro extends Frame {
     
-	public int qtdClick = 0;
+//	public int qtdClick = 0;
 	public BotaoTab btAnt;
-	public int jogador = 1;
+//	public int jogador = 1;
 //	public EstadoDamas damas;
 	public Panel tab;
-	public int nivel = 3;
+//	public int nivel = 3;
 	
-    private int xOld;
-    private int yOld;
+//    private int xOld;
+//    private int yOld;
 	
-    public int linhas = 8;
-    public int colunas = 8;
+    public int linhas = Server.LENGTH;
+    public int colunas = Server.LENGTH;
     
     boolean tipo = true;
 	
 	public BufferedImage imgBrancas;
 	public BufferedImage imgPretas;
-	public BufferedImage imgPretaDamas;
-	public BufferedImage imgBrancaDamas;
+//	public BufferedImage imgPretaDamas;
+//	public BufferedImage imgBrancaDamas;
 	public BufferedImage imgFundoBranca;
 	public BufferedImage imgFundoPreta;
+	
+    public Tabuleiro() {
+    	
+    	this.setTitle("Jogo Reversi");
+        this.setSize(600, 600);
+        this.setLocationRelativeTo(null);
+        this.setResizable(false);
+        
+        Panel painel = new Panel(new GridLayout(linhas, colunas));
+//        painel.setPreferredSize(new Dimension(600, 600));
+        
+        tab = painel;
+        
+        try {
+            imgBrancas = ImageIO.read(getClass().getClassLoader().getResource("img/branca.jpg"));
+    	} catch (IOException e) {
+        }
+        try {
+            imgPretas = ImageIO.read(getClass().getClassLoader().getResource("img/preta.jpg"));
+    	} catch (IOException e) {
+        }
+//        try {
+//            imgPretaDamas = ImageIO.read(getClass().getClassLoader().getResource("img/preta_dama.jpg"));
+//    	} catch (IOException e) {
+//        }
+//        try {
+//            imgBrancaDamas = ImageIO.read(getClass().getClassLoader().getResource("img/branca_dama.jpg"));
+//    	} catch (IOException e) {
+//        }
+        try {
+            imgFundoBranca = ImageIO.read(getClass().getClassLoader().getResource("img/fundo_branco.jpg"));
+    	} catch (IOException e) {
+        }
+        try {
+            imgFundoPreta = ImageIO.read(getClass().getClassLoader().getResource("img/fundo_escuro.jpg"));
+    	} catch (IOException e) {
+        }
+        
+        initTab(painel);
+        
+        this.setLayout(new BorderLayout());
+        this.add(BorderLayout.CENTER, painel);
+        
+        WindowListener listener = new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                Object origem = e.getSource();
+                if (origem == Tabuleiro.this) {
+                    System.exit(0);
+                }
+            }
+        };
+        this.addWindowListener(listener);
+    }
+
+	public void initTab(Panel p){
+		JButton bt = null;
+		
+		for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+            	if (tipo){
+            		bt = new BotaoTab(new ImageIcon(imgFundoPreta), i, j, 0, 1);
+            	}else{
+//                    if (mat[i][j] == 0)
+                    	bt = new BotaoTab(new ImageIcon(imgFundoBranca), i, j, 0, 0);
+//                    if (mat[i][j] == Piece.PLAYER_1) {
+//                    	bt = new BotaoTab(new ImageIcon(imgPretas), i, j, mat[i][j], 0);
+//                    } else if (mat[i][j] == Piece.PLAYER_2) {
+//                    	bt = new BotaoTab(new ImageIcon(imgBrancas), i, j, mat[i][j], 0);
+//                    }
+            	}
+            	
+            	p.add(bt);
+            	tipo = !tipo;
+            }
+            tipo = !tipo;
+        }
+
+//		this.pack();
+		
+	}
+	
+	public void doChanges(ArrayList arr) {
+		
+	}
 	
 	public class BotaoTab extends JButton implements MouseListener {  
 	    
@@ -72,21 +160,19 @@ public class Tabuleiro extends Frame {
 	    
 		@Override
 		public void mouseClicked(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
 			// Primeiro clique, devo aguardar o proximo
-			if (qtdClick == 0){
-				
-				this.setBorder(new LineBorder(Color.BLACK, 6));
-				this.setContentAreaFilled(false);
-				
-				qtdClick++;
-				btAnt = this;
-				
-				xOld = x;
-				yOld = y;
-			
-			}else{
+//			if (qtdClick == 0){
+//				
+//				this.setBorder(new LineBorder(Color.BLACK, 6));
+//				this.setContentAreaFilled(false);
+//				
+//				qtdClick++;
+//				btAnt = this;
+//				
+//				xOld = x;
+//				yOld = y;
+//			
+//			}else{
 				
 		    	try {
 //		    		damas = damas.movimento(yOld, xOld, y, x);
@@ -120,13 +206,13 @@ public class Tabuleiro extends Frame {
 				
 				tab.removeAll();
 				
-//				atualizaTab(damas.getDamas(), tab);
+//				initTab(damas.getDamas(), tab);
 				
 				tab.repaint();
 				
-				qtdClick = 0;
+//				qtdClick = 0;
 				
-			}
+//			}
 			
 		}
 		
@@ -155,97 +241,4 @@ public class Tabuleiro extends Frame {
 		}  
 	}
 	
-	public void atualizaTab(int[][] mat, Panel p){
-        
-		JButton bt = null;
-		
-		for (int i = 0; i < linhas; i++) {
-            for (int j = 0; j < colunas; j++) {
-            	
-            	if (tipo){
-            		bt = new BotaoTab(new ImageIcon(imgFundoPreta), i, j, mat[i][j], 1);
-            	}else{
-                	
-                    if (mat[i][j] == 0)
-                    	bt = new BotaoTab(new ImageIcon(imgFundoBranca), i, j, mat[i][j],0);
-                    if (mat[i][j] == 1)
-                    	bt = new BotaoTab(new ImageIcon(imgBrancas), i, j, mat[i][j], 0);
-                    if (mat[i][j] == 2)
-                    	bt = new BotaoTab(new ImageIcon(imgPretas), i, j, mat[i][j], 0);
-                    if (mat[i][j] == 11)
-                    	bt = new BotaoTab(new ImageIcon(imgBrancaDamas), i, j, mat[i][j], 0);
-                    if (mat[i][j] == 22)
-                    	bt = new BotaoTab(new ImageIcon(imgPretaDamas), i, j, mat[i][j], 0);
-            	}
-            	
-            	p.add(bt);
-            	tipo = !tipo;
-            }
-            tipo = !tipo;
-        }
-
-//		this.pack();
-		
-	}
-	
-    public Tabuleiro(int[][] matriz, int nivel) {
-    	
-    	this.setTitle("Jogo de Damas");
-        this.setSize(600, 600);
-        this.setLocationRelativeTo(null);
-        this.setResizable(false);
-//        this.damas = d;
-        this.nivel = nivel;
-        
-        Panel painel = new Panel(new GridLayout(linhas, colunas));
-//        painel.setPreferredSize(new Dimension(600, 600));
-        
-        tab = painel;
-        
-        try {
-            imgBrancas = ImageIO.read(getClass().getResourceAsStream("img/branca.jpg"));
-        	} catch (IOException e) {
-        }
-        
-        try {
-            imgPretas = ImageIO.read(getClass().getResourceAsStream("img/preta.jpg"));
-        	} catch (IOException e) {
-        }
-        
-        try {
-            imgPretaDamas = ImageIO.read(getClass().getResourceAsStream("img/preta_dama.jpg"));
-        	} catch (IOException e) {
-        }
-        
-        try {
-            imgBrancaDamas = ImageIO.read(getClass().getResourceAsStream("img/branca_dama.jpg"));
-        	} catch (IOException e) {
-        }
-        
-        try {
-            imgFundoBranca = ImageIO.read(getClass().getResourceAsStream("img/fundo_branco.jpg"));
-        	} catch (IOException e) {
-        }
-
-        try {
-            imgFundoPreta = ImageIO.read(getClass().getResourceAsStream("img/fundo_escuro.jpg"));
-        	} catch (IOException e) {
-        }
-        
-        atualizaTab(matriz, painel);
-        
-        this.setLayout(new BorderLayout());
-        this.add(BorderLayout.CENTER, painel);
-        
-        WindowListener listener = new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                Object origem = e.getSource();
-                if (origem == Tabuleiro.this) {
-                    System.exit(0);
-                }
-            }
-        };
-        this.addWindowListener(listener);
-        
-    }
 }

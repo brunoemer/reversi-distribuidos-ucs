@@ -5,8 +5,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import server.Piece;
+import server.Server;
 
 public class Client {
 	private int player_id;
@@ -18,40 +20,60 @@ public class Client {
 	public void start() {
 		Socket server;
 		try{			
-			server = new Socket("127.0.0.1",Integer.parseInt("8004"));
+			server = new Socket("127.0.0.1", Server.PORT);
 			
 			//recebe o id do player
 			ObjectInputStream in = new ObjectInputStream(server.getInputStream());
 			try {
 				this.player_id = (int) in.readObject();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 			//aguarda e recebe tabuleiro inicial
 			in = new ObjectInputStream(server.getInputStream());
+			ArrayList arr = null;
 			try {
-				ArrayList arr = (ArrayList) in.readObject();
-				arr.toString();
+				arr = (ArrayList) in.readObject();
+//				System.out.println(arr.toString());
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
+			//carrega interface
+			Tabuleiro tab = new Tabuleiro();
+			tab.doChanges(arr);
+			tab.setVisible(true);
+			
 			while (true) {
+				//aguarda sua vez
+				in = new ObjectInputStream(server.getInputStream());
+				try {
+					int pl = (int) in.readObject();
+					System.out.println("Sua vez");
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+				
+				//// teste
+				 Scanner ins = new Scanner(System.in);
+				 System.out.print("x=");
+				 int x = ins.nextInt();
+				 System.out.print("y=");
+				 int y = ins.nextInt();
+				//// teste
 				//faz jogada e envia para servidor
 				ObjectOutputStream out = new ObjectOutputStream(server.getOutputStream());
-				Piece p = new Piece(4, 3, this.player_id);
+				Piece p = new Piece(x, y, this.player_id);
 				out.writeObject(p);
 				
 				//recebe atualizacao do tabuleiro
 				in = new ObjectInputStream(server.getInputStream());
 				try {
-					ArrayList arr = (ArrayList) in.readObject();
-					arr.toString();
+					arr = (ArrayList) in.readObject();
+					tab.doChanges(arr);
+//					System.out.println(arr.toString());
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
