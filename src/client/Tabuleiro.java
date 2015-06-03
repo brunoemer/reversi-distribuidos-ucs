@@ -2,6 +2,7 @@ package client;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Panel;
@@ -25,39 +26,26 @@ import server.Server;
 
 public class Tabuleiro extends Frame {
     
-//	public int qtdClick = 0;
+	private Client client;
 	public BotaoTab btAnt;
-//	public int jogador = 1;
-//	public EstadoDamas damas;
-	public Panel tab;
-//	public int nivel = 3;
-	
-//    private int xOld;
-//    private int yOld;
+	public Panel painel;
 	
     public int linhas = Server.LENGTH;
     public int colunas = Server.LENGTH;
     
-    boolean tipo = true;
-	
 	public BufferedImage imgBrancas;
 	public BufferedImage imgPretas;
-//	public BufferedImage imgPretaDamas;
-//	public BufferedImage imgBrancaDamas;
 	public BufferedImage imgFundoBranca;
 	public BufferedImage imgFundoPreta;
 	
     public Tabuleiro() {
-    	
     	this.setTitle("Jogo Reversi");
         this.setSize(600, 600);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         
-        Panel painel = new Panel(new GridLayout(linhas, colunas));
+        this.painel = new Panel(new GridLayout(linhas, colunas));
 //        painel.setPreferredSize(new Dimension(600, 600));
-        
-        tab = painel;
         
         try {
             imgBrancas = ImageIO.read(getClass().getClassLoader().getResource("img/branca.jpg"));
@@ -67,14 +55,6 @@ public class Tabuleiro extends Frame {
             imgPretas = ImageIO.read(getClass().getClassLoader().getResource("img/preta.jpg"));
     	} catch (IOException e) {
         }
-//        try {
-//            imgPretaDamas = ImageIO.read(getClass().getClassLoader().getResource("img/preta_dama.jpg"));
-//    	} catch (IOException e) {
-//        }
-//        try {
-//            imgBrancaDamas = ImageIO.read(getClass().getClassLoader().getResource("img/branca_dama.jpg"));
-//    	} catch (IOException e) {
-//        }
         try {
             imgFundoBranca = ImageIO.read(getClass().getClassLoader().getResource("img/fundo_branco.jpg"));
     	} catch (IOException e) {
@@ -84,10 +64,10 @@ public class Tabuleiro extends Frame {
     	} catch (IOException e) {
         }
         
-        initTab(painel);
+        initTab();
         
         this.setLayout(new BorderLayout());
-        this.add(BorderLayout.CENTER, painel);
+        this.add(BorderLayout.CENTER, this.painel);
         
         WindowListener listener = new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -100,55 +80,60 @@ public class Tabuleiro extends Frame {
         this.addWindowListener(listener);
     }
 
-	public void initTab(Panel p){
+	public void initTab(){
 		JButton bt = null;
+		boolean tipo = true;
 		
 		for (int i = 0; i < linhas; i++) {
             for (int j = 0; j < colunas; j++) {
-            	if (tipo){
-            		bt = new BotaoTab(new ImageIcon(imgFundoPreta), i, j, 0, 1);
-            	}else{
-//                    if (mat[i][j] == 0)
-                    	bt = new BotaoTab(new ImageIcon(imgFundoBranca), i, j, 0, 0);
-//                    if (mat[i][j] == Piece.PLAYER_1) {
-//                    	bt = new BotaoTab(new ImageIcon(imgPretas), i, j, mat[i][j], 0);
-//                    } else if (mat[i][j] == Piece.PLAYER_2) {
-//                    	bt = new BotaoTab(new ImageIcon(imgBrancas), i, j, mat[i][j], 0);
-//                    }
+            	if (tipo) {
+            		bt = new BotaoTab(new ImageIcon(imgFundoPreta), j, i);
+            	} else {
+                	bt = new BotaoTab(new ImageIcon(imgFundoBranca), j, i);
             	}
-            	
-            	p.add(bt);
+            	this.painel.add(bt);
             	tipo = !tipo;
             }
             tipo = !tipo;
         }
 
 //		this.pack();
-		
 	}
 	
-	public void doChanges(ArrayList arr) {
-		
+	public void doChanges(ArrayList<Piece> arr) {
+		if (arr.size() <= 0) {
+    		JOptionPane.showMessageDialog(this, "Campo invalido", "Erro", JOptionPane.WARNING_MESSAGE);
+    		return;
+		}
+		Component[] c = this.painel.getComponents();
+		for (Piece p : arr) {
+			int pos = (p.getY() * colunas) + p.getX();
+//			System.out.println(pos);
+			
+			BotaoTab b = (BotaoTab) c[pos];
+			if (p.getPlayer() == Piece.PLAYER_1) {
+				b.setIcon(new ImageIcon(imgPretas));
+			} else {
+				b.setIcon(new ImageIcon(imgBrancas));
+			}
+		}
+	}
+	
+	public void setClient(Client c) {
+		this.client = c;
 	}
 	
 	public class BotaoTab extends JButton implements MouseListener {  
 	    
-	    JButton bt = new JButton();
-	    
 	    private int x;
 	    private int y;
-	    private int corFundo;
-	    
-	    private int peca;
 	    
 	    //usa o construtor da classe super (JButton), e adiciona o mouselistener ao objeto  
-	    BotaoTab(ImageIcon img, int x, int y, int peca, int corFundo)  
+	    BotaoTab(ImageIcon img, int x, int y)  
 	    {  
 	        this.setIcon(img);
 	        this.x = x;
 	        this.y = y;
-	        this.peca = peca;
-	        this.corFundo = corFundo;
 	        
 	        this.setBackground(Color.WHITE);
 	        this.setBorder(new LineBorder(Color.WHITE, 0));
@@ -160,9 +145,9 @@ public class Tabuleiro extends Frame {
 	    
 		@Override
 		public void mouseClicked(MouseEvent arg0) {
-			// Primeiro clique, devo aguardar o proximo
+			client.sendPlay(x, y);
+			
 //			if (qtdClick == 0){
-//				
 //				this.setBorder(new LineBorder(Color.BLACK, 6));
 //				this.setContentAreaFilled(false);
 //				
@@ -173,8 +158,7 @@ public class Tabuleiro extends Frame {
 //				yOld = y;
 //			
 //			}else{
-				
-		    	try {
+//		    	try {
 //		    		damas = damas.movimento(yOld, xOld, y, x);
 //		    		
 //		        	Problema p = new ProblemaDamas();
@@ -193,22 +177,22 @@ public class Tabuleiro extends Frame {
 //		        		JOptionPane.showMessageDialog(this, "Voce perdeu", "Fim de jogo", JOptionPane.WARNING_MESSAGE);
 //		        		System.exit(0);
 //		        	}
-				} catch (Exception ex) {
-					JOptionPane.showMessageDialog(this, "Erro: "+ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+//				} catch (Exception ex) {
+//					JOptionPane.showMessageDialog(this, "Erro: "+ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
 //					System.out.println("Erro: "+ex.getMessage());
 //					ex.printStackTrace();
-				}
+//				}
 		    	
-				if (btAnt.corFundo == 0)
-					btAnt.setBorder(new LineBorder(Color.WHITE, 0));
-				else if (btAnt.corFundo == 1)
-					btAnt.setBorder(new LineBorder(new Color(205,201,201) ));
+//				if (btAnt.corFundo == 0)
+//					btAnt.setBorder(new LineBorder(Color.WHITE, 0));
+//				else if (btAnt.corFundo == 1)
+//					btAnt.setBorder(new LineBorder(new Color(205,201,201) ));
 				
-				tab.removeAll();
+//				painel.removeAll();
 				
 //				initTab(damas.getDamas(), tab);
 				
-				tab.repaint();
+//				painel.repaint();
 				
 //				qtdClick = 0;
 				
