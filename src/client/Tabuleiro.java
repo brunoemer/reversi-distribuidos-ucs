@@ -29,6 +29,7 @@ public class Tabuleiro extends Frame {
 	private Client client;
 	public BotaoTab btAnt;
 	public Panel painel;
+	private boolean suaVez;
 	
     public int linhas = Server.LENGTH;
     public int colunas = Server.LENGTH;
@@ -38,8 +39,8 @@ public class Tabuleiro extends Frame {
 	public BufferedImage imgFundoBranca;
 	public BufferedImage imgFundoPreta;
 	
-    public Tabuleiro() {
-    	this.setTitle("Jogo Reversi");
+    public Tabuleiro(int player_id) {
+    	this.setTitle("Jogo Reversi - Player "+player_id);
         this.setSize(600, 600);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
@@ -102,7 +103,9 @@ public class Tabuleiro extends Frame {
 	
 	public void doChanges(ArrayList<Piece> arr) {
 		if (arr.size() <= 0) {
-    		JOptionPane.showMessageDialog(this, "Campo invalido", "Erro", JOptionPane.WARNING_MESSAGE);
+			if (suaVez) {
+				JOptionPane.showMessageDialog(this, "Campo invalido", "Erro", JOptionPane.WARNING_MESSAGE);
+			}
     		return;
 		}
 		Component[] c = this.painel.getComponents();
@@ -123,14 +126,17 @@ public class Tabuleiro extends Frame {
 		this.client = c;
 	}
 	
+	public void setSuaVez(boolean s) {
+		this.suaVez = s;
+	}
+	
 	public class BotaoTab extends JButton implements MouseListener {  
 	    
 	    private int x;
 	    private int y;
 	    
 	    //usa o construtor da classe super (JButton), e adiciona o mouselistener ao objeto  
-	    BotaoTab(ImageIcon img, int x, int y)  
-	    {  
+	    BotaoTab(ImageIcon img, int x, int y) {  
 	        this.setIcon(img);
 	        this.x = x;
 	        this.y = y;
@@ -145,7 +151,11 @@ public class Tabuleiro extends Frame {
 	    
 		@Override
 		public void mouseClicked(MouseEvent arg0) {
-			client.sendPlay(x, y);
+			if (suaVez) {
+				client.sendPlay(x, y);
+			} else {
+	    		JOptionPane.showMessageDialog(this, "Aguarde sua vez", "Erro", JOptionPane.WARNING_MESSAGE);
+			}
 			
 //			if (qtdClick == 0){
 //				this.setBorder(new LineBorder(Color.BLACK, 6));

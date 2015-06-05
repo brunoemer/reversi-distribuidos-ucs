@@ -318,13 +318,12 @@ public class Server {
 			while (true) {
 				try {
 					ObjectInputStream in;
-					if (current_player == Piece.PLAYER_1) {
-						out = new ObjectOutputStream(cliente.getOutputStream());
-					} else {
-						out = new ObjectOutputStream(cliente2.getOutputStream());
-					}
-					//envia sua vez - current_player
+					//envia player que vai fazer a jogada - current_player
+					out = new ObjectOutputStream(cliente.getOutputStream());
 					out.writeObject(current_player); // send
+					out = new ObjectOutputStream(cliente2.getOutputStream());
+					out.writeObject(current_player); // send
+					
 					try {
 						if (current_player == Piece.PLAYER_1) {
 							in = new ObjectInputStream(cliente.getInputStream());
@@ -347,13 +346,15 @@ public class Server {
 					out.writeObject(tab);
 					out = new ObjectOutputStream(cliente2.getOutputStream());
 					out.writeObject(tab);
-										
-					if (current_player == Piece.PLAYER_1) {
-						current_player = Piece.PLAYER_2;
-					} else {
-						current_player = Piece.PLAYER_1;
-					}
 
+					if (tab.size() > 0) {
+						if (current_player == Piece.PLAYER_1) {
+							current_player = Piece.PLAYER_2;
+						} else {
+							current_player = Piece.PLAYER_1;
+						}
+					}
+					
 					// verifica se jogo terminou e envia fim de jogo
 
 					

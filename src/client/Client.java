@@ -41,32 +41,20 @@ public class Client {
 			}
 			
 			//carrega interface
-			this.tab = new Tabuleiro();
+			this.tab = new Tabuleiro(this.player_id);
 			this.tab.setClient(this);
 			this.tab.doChanges(arr);
 			this.tab.setVisible(true);
 			
 			while (true) {
-				//aguarda sua vez
+				//recebe player que deve fazer a jogada
 				in = new ObjectInputStream(this.server.getInputStream());
 				try {
-					int pl = (int) in.readObject();
-//					System.out.println("Sua vez");
+					int player = (int) in.readObject();
+					this.tab.setSuaVez(player == this.player_id);
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
-				
-//				//// teste
-//				 Scanner ins = new Scanner(System.in);
-//				 System.out.print("x=");
-//				 int x = ins.nextInt();
-//				 System.out.print("y=");
-//				 int y = ins.nextInt();
-//				//// teste
-//				//faz jogada e envia para servidor
-//				ObjectOutputStream out = new ObjectOutputStream(this.server.getOutputStream());
-//				Piece p = new Piece(x, y, this.player_id);
-//				out.writeObject(p);
 				
 				//recebe atualizacao do tabuleiro
 				in = new ObjectInputStream(this.server.getInputStream());
