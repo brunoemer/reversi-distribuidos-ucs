@@ -40,7 +40,7 @@ public class Server {
 		return tab;
 	}
 
-	public ArrayList doPlay(Piece p) {
+	public ArrayList getChanges(Piece p) {
 		ArrayList<Piece> tab = new ArrayList<Piece>();
 		int x = p.getX(), y = p.getY();
 		//verifica se esta sem peca
@@ -266,13 +266,58 @@ public class Server {
 			}
 		}
 		
+		return tab;
+	}
+	
+	public ArrayList doPlay(Piece p) {
+		ArrayList<Piece> tab = this.getChanges(p);
+		
 		//atualiza tabuleiro
 		if (tab.size() > 0) {
 			for (Piece pp : tab) {
 				this.pieceToBoard(pp);
 			}
 		}
+		
 		return tab;
+	}
+	
+	public int checkPlay(int player) {
+		// verifica se jogo terminou, se o jogador tem jogadas para fazer
+		int pwin = 0;
+		ArrayList tab;
+		boolean endedGame = true;
+		for (int y = 0; y < Server.LENGTH; y++) {
+			for (int x = 0; x < Server.LENGTH; x++) {
+				if (this.getPlayerBoard(x, y) == 0) {
+					tab = this.getChanges(new Piece(x, y, player));
+					if (tab.size() > 0) {
+						endedGame = false;
+						break;
+					}
+				}
+			}
+		}
+		if (endedGame) {
+			int p1 = 0, p2 = 0;
+			for (int y = 0; y < Server.LENGTH; y++) {
+				for (int x = 0; x < Server.LENGTH; x++) {
+					if (this.getPlayerBoard(x, y) == Piece.PLAYER_1) {
+						p1++;
+					} else if (this.getPlayerBoard(x, y) == Piece.PLAYER_1) {
+						p2++;
+					}
+				}
+			}
+			pwin = -1;
+			if (p1 > p2) {
+				pwin = Piece.PLAYER_1 + 2;
+			} else if (p2 > p1) {
+				pwin = Piece.PLAYER_2 + 2;
+			}
+		}
+		//se 0 jogo nao terminou, se -1 empate, se 3 player 1 ganhou, se 4 player 2
+		return pwin;
 	}
 	
 	public void pieceToBoard(Piece p) {
@@ -314,15 +359,20 @@ public class Server {
 			out2 = new ObjectOutputStream(cliente2.getOutputStream());
 			out2.writeObject(tab); // send
 
+			int playerWin = 0;
 			int current_player = Piece.PLAYER_1;
 			while (true) {
 				try {
 					ObjectInputStream in;
-					//envia player que vai fazer a jogada - current_player
+					//envia player que vai fazer a jogada ou fim de jogo - current_player
 					out = new ObjectOutputStream(cliente.getOutputStream());
 					out.writeObject(current_player); // send
 					out = new ObjectOutputStream(cliente2.getOutputStream());
 					out.writeObject(current_player); // send
+					
+					if (playerWin != 0) {
+						break;
+					}
 					
 					try {
 						if (current_player == Piece.PLAYER_1) {
@@ -348,35 +398,28 @@ public class Server {
 					out.writeObject(tab);
 
 					if (tab.size() > 0) {
+						// altera a vez do jogador
 						if (current_player == Piece.PLAYER_1) {
 							current_player = Piece.PLAYER_2;
 						} else {
 							current_player = Piece.PLAYER_1;
 						}
-					}
-					
-					// verifica se jogo terminou e envia fim de jogo
 
-					
+						// verifica se jogo terminou e envia fim de jogo
+						playerWin = this.checkPlay(current_player);
+						if (playerWin != 0) {
+							current_player = playerWin;
+						}
+					}
+
 				} catch (IOException e) {
 					e.printStackTrace();
+					break;
 				}
 			}
-
-			// exemplo send object
-//			ArrayList arr = new ArrayList<Piece>();
-//			arr.add(new Piece(1, 2, 1));
-//			arr.add(new Piece(1, 3, 2));
-//			System.out.println(arr.toString());
-//			ObjectOutputStream out = new ObjectOutputStream(cliente.getOutputStream());
-//			out.writeObject(arr); // send
-
-			// PrintWriter out = new PrintWriter(new BufferedWriter( new OutputStreamWriter(cliente.getOutputStream())),true);
-			// out.println("server2client"); //send
-
-			// BufferedReader in = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
-			// String str = in.readLine(); //recv
-			// System.out.println("Server recv: "+str);
+			
+			cliente.close();
+			cliente2.close();
 
 		} catch (NumberFormatException e1) {
 			e1.printStackTrace();

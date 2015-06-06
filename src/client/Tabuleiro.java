@@ -104,14 +104,13 @@ public class Tabuleiro extends Frame {
 	public void doChanges(ArrayList<Piece> arr) {
 		if (arr.size() <= 0) {
 			if (suaVez) {
-				JOptionPane.showMessageDialog(this, "Campo invalido", "Erro", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Campo invalido", "Erro", JOptionPane.ERROR_MESSAGE);
 			}
     		return;
 		}
 		Component[] c = this.painel.getComponents();
 		for (Piece p : arr) {
 			int pos = (p.getY() * colunas) + p.getX();
-//			System.out.println(pos);
 			
 			BotaoTab b = (BotaoTab) c[pos];
 			if (p.getPlayer() == Piece.PLAYER_1) {
@@ -154,7 +153,7 @@ public class Tabuleiro extends Frame {
 			if (suaVez) {
 				client.sendPlay(x, y);
 			} else {
-	    		JOptionPane.showMessageDialog(this, "Aguarde sua vez", "Erro", JOptionPane.WARNING_MESSAGE);
+	    		JOptionPane.showMessageDialog(this, "Aguarde sua vez", "Erro", JOptionPane.ERROR_MESSAGE);
 			}
 			
 //			if (qtdClick == 0){
