@@ -304,7 +304,7 @@ public class Server {
 				for (int x = 0; x < Server.LENGTH; x++) {
 					if (this.getPlayerBoard(x, y) == Piece.PLAYER_1) {
 						p1++;
-					} else if (this.getPlayerBoard(x, y) == Piece.PLAYER_1) {
+					} else if (this.getPlayerBoard(x, y) == Piece.PLAYER_2) {
 						p2++;
 					}
 				}
