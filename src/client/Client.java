@@ -77,6 +77,18 @@ public class Client {
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
+
+				/*
+				 * ver erro
+				 * java.io.EOFException
+	at java.io.ObjectInputStream$PeekInputStream.readFully(ObjectInputStream.java:2325)
+	at java.io.ObjectInputStream$BlockDataInputStream.readShort(ObjectInputStream.java:2794)
+	at java.io.ObjectInputStream.readStreamHeader(ObjectInputStream.java:801)
+	at java.io.ObjectInputStream.<init>(ObjectInputStream.java:299)
+	at client.Client.start(Client.java:73)
+	at client.Client.main(Client.java:105)
+				 * 
+				 */
 				
 			}
 			

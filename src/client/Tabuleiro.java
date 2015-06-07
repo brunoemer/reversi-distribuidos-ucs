@@ -97,8 +97,6 @@ public class Tabuleiro extends Frame {
             }
             tipo = !tipo;
         }
-
-//		this.pack();
 	}
 	
 	public void doChanges(ArrayList<Piece> arr) {
@@ -156,81 +154,26 @@ public class Tabuleiro extends Frame {
 	    		JOptionPane.showMessageDialog(this, "Aguarde sua vez", "Erro", JOptionPane.ERROR_MESSAGE);
 			}
 			
-//			if (qtdClick == 0){
-//				this.setBorder(new LineBorder(Color.BLACK, 6));
-//				this.setContentAreaFilled(false);
-//				
-//				qtdClick++;
-//				btAnt = this;
-//				
-//				xOld = x;
-//				yOld = y;
-//			
-//			}else{
-//		    	try {
-//		    		damas = damas.movimento(yOld, xOld, y, x);
-//		    		
-//		        	Problema p = new ProblemaDamas();
-//		        	p.setNodoInicial(damas);
-//		        	ResolvedorDeProblemas r = new ResolvedorDeProblemas();
-//		        	r.MINIMAX_NIVEL = nivel;
-//		        	Nodo nodo = r.maxInicial(p);
-//		        	if(nodo == null){
-//		        		JOptionPane.showMessageDialog(this, "Voce ganhou", "Fim de jogo", JOptionPane.WARNING_MESSAGE);
-//		        		System.exit(0);
-//		        	}
-//		        	damas = (EstadoDamas) nodo.getEstado();
-//		        	
-//		        	Lista l = p.gerarFilhos(nodo);
-//		        	if(l.vazia()){
-//		        		JOptionPane.showMessageDialog(this, "Voce perdeu", "Fim de jogo", JOptionPane.WARNING_MESSAGE);
-//		        		System.exit(0);
-//		        	}
-//				} catch (Exception ex) {
-//					JOptionPane.showMessageDialog(this, "Erro: "+ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-//					System.out.println("Erro: "+ex.getMessage());
-//					ex.printStackTrace();
-//				}
-		    	
-//				if (btAnt.corFundo == 0)
-//					btAnt.setBorder(new LineBorder(Color.WHITE, 0));
-//				else if (btAnt.corFundo == 1)
-//					btAnt.setBorder(new LineBorder(new Color(205,201,201) ));
-				
-//				painel.removeAll();
-				
-//				initTab(damas.getDamas(), tab);
-				
-//				painel.repaint();
-				
-//				qtdClick = 0;
-				
-//			}
-			
 		}
 		
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
+			this.setBorder(new LineBorder(Color.BLACK, 6));
 		}
 
 		@Override
 		public void mouseExited(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
+	        this.setBorder(new LineBorder(Color.WHITE, 0));
 		}
 
 		@Override
 		public void mousePressed(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
+
 		}  
 	}
 	
