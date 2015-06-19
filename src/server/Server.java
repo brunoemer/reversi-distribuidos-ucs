@@ -17,14 +17,22 @@ public class Server {
 	}
 	
 	public ArrayList initPlay() {
+		ArrayList tab = new ArrayList();
+		
 		this.board = new int[Server.LENGTH][Server.LENGTH];
 		for (int i = 0; i < Server.LENGTH; i++) {
 			for (int j = 0; j < Server.LENGTH; j++) {
 				this.board[i][j] = 0;
+				
+				//teste
+				if(!((i == 1 && j == 2) || (i == 3 && j == 5) || (i == 3 && j == 1))){
+					Piece p = new Piece(j, i, i%2==0?Piece.PLAYER_1:Piece.PLAYER_1);
+					tab.add(p);
+					this.pieceToBoard(p);
+				}
 			}
 		}
 		
-		ArrayList tab = new ArrayList();
 		Piece p = new Piece(3, 3, Piece.PLAYER_2);
 		tab.add(p);
 		this.pieceToBoard(p);
@@ -283,22 +291,46 @@ public class Server {
 	}
 	
 	public int checkPlay(int player) {
-		// verifica se jogo terminou, se o jogador tem jogadas para fazer
+		// se o jogador tem jogadas para fazer
 		int pwin = 0;
 		ArrayList tab;
-		boolean endedGame = true;
+		boolean hasPlay = false;
 		for (int y = 0; y < Server.LENGTH; y++) {
 			for (int x = 0; x < Server.LENGTH; x++) {
 				if (this.getPlayerBoard(x, y) == 0) {
 					tab = this.getChanges(new Piece(x, y, player));
+					System.out.println(x+"-"+y);
 					if (tab.size() > 0) {
-						endedGame = false;
+						hasPlay = true;
 						break;
 					}
 				}
 			}
 		}
-		if (endedGame) {
+		boolean hasPlay2 = false;
+		if (!hasPlay) {
+			int other_player = this.getNextPlayer(player);
+			for (int y = 0; y < Server.LENGTH; y++) {
+				for (int x = 0; x < Server.LENGTH; x++) {
+					if (this.getPlayerBoard(x, y) == 0) {
+						tab = this.getChanges(new Piece(x, y, other_player));
+						System.out.println(tab);
+						if (tab.size() > 0) {
+							hasPlay2 = true;
+							break;
+						}
+					}
+				}
+			}
+			if (hasPlay2) {
+				pwin = player + 4;
+			}
+		}
+
+		System.out.println(hasPlay);
+		System.out.println(hasPlay2);
+		System.out.println(pwin);
+		if (!hasPlay && !hasPlay2) {
 			int p1 = 0, p2 = 0;
 			for (int y = 0; y < Server.LENGTH; y++) {
 				for (int x = 0; x < Server.LENGTH; x++) {
@@ -316,8 +348,24 @@ public class Server {
 				pwin = Piece.PLAYER_2 + 2;
 			}
 		}
-		//se 0 jogo nao terminou, se -1 empate, se 3 player 1 ganhou, se 4 player 2
+		//se 0 jogo nao terminou, 
+		//se -1 empate, 
+		//se 3 player 1 ganhou, 
+		//se 4 player 2
+		//se 5 player 1 nao tem jogada
+		//se 6 player 2 nao tem jogada
 		return pwin;
+	}
+	
+	public int getNextPlayer(int player)
+	{
+		int current_player;
+		if (player == Piece.PLAYER_1) {
+			current_player = Piece.PLAYER_2;
+		} else {
+			current_player = Piece.PLAYER_1;
+		}
+		return current_player;
 	}
 	
 	public void pieceToBoard(Piece p) {
@@ -359,18 +407,19 @@ public class Server {
 			out2 = new ObjectOutputStream(cliente2.getOutputStream());
 			out2.writeObject(tab); // send
 
-			int playerWin = 0;
 			int current_player = Piece.PLAYER_1;
+			int player_check = current_player;
 			while (true) {
 				try {
 					ObjectInputStream in;
 					//envia player que vai fazer a jogada ou fim de jogo - current_player
 					out = new ObjectOutputStream(cliente.getOutputStream());
-					out.writeObject(current_player); // send
+					out.writeObject(player_check); // send
 					out = new ObjectOutputStream(cliente2.getOutputStream());
-					out.writeObject(current_player); // send
+					out.writeObject(player_check); // send
 					
-					if (playerWin != 0) {
+					//se terminou o jogo
+					if (player_check >= 3 && player_check <= 4) {
 						break;
 					}
 					
@@ -397,18 +446,15 @@ public class Server {
 					out = new ObjectOutputStream(cliente2.getOutputStream());
 					out.writeObject(tab);
 
+					// se for jogada valida
 					if (tab.size() > 0) {
 						// altera a vez do jogador
-						if (current_player == Piece.PLAYER_1) {
-							current_player = Piece.PLAYER_2;
-						} else {
-							current_player = Piece.PLAYER_1;
-						}
+						current_player = this.getNextPlayer(current_player);
 
-						// verifica se jogo terminou e envia fim de jogo
-						playerWin = this.checkPlay(current_player);
-						if (playerWin != 0) {
-							current_player = playerWin;
+						// verifica se jogo terminou ou nao tem jogada disponivel e envia
+						player_check = this.checkPlay(current_player);
+						if (player_check == 0) {
+							player_check = current_player;
 						}
 					}
 
@@ -431,12 +477,6 @@ public class Server {
 	public static void main(String[] args) {
 		Server s = new Server();
 		s.start();
-		
-//		s.initPlay();
-//		s.printBoard();
-//		Piece p = new Piece(2, 3, 1);
-//		s.doPlay(p);
-//		s.printBoard();
 		
 	}
 

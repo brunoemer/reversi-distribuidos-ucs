@@ -3,6 +3,7 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Panel;
@@ -39,31 +40,14 @@ public class Tabuleiro extends Frame {
 	public BufferedImage imgFundoBranca;
 	public BufferedImage imgFundoPreta;
 	
-    public Tabuleiro(int player_id) {
-    	this.setTitle("Jogo Reversi - Player "+player_id);
+    public Tabuleiro() {
         this.setSize(600, 600);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         
         this.painel = new Panel(new GridLayout(linhas, colunas));
-//        painel.setPreferredSize(new Dimension(600, 600));
-        
-        try {
-            imgBrancas = ImageIO.read(getClass().getClassLoader().getResource("img/branca.jpg"));
-    	} catch (IOException e) {
-        }
-        try {
-            imgPretas = ImageIO.read(getClass().getClassLoader().getResource("img/preta.jpg"));
-    	} catch (IOException e) {
-        }
-        try {
-            imgFundoBranca = ImageIO.read(getClass().getClassLoader().getResource("img/fundo_branco.jpg"));
-    	} catch (IOException e) {
-        }
-        try {
-            imgFundoPreta = ImageIO.read(getClass().getClassLoader().getResource("img/fundo_escuro.jpg"));
-    	} catch (IOException e) {
-        }
+//        this.painel.setSize(600, 600);
+//        this.painel.setPreferredSize(new Dimension(500, 500));
         
         initTab();
         
@@ -82,6 +66,23 @@ public class Tabuleiro extends Frame {
     }
 
 	public void initTab(){
+        try {
+            imgBrancas = ImageIO.read(getClass().getClassLoader().getResource("img/branca.jpg"));
+    	} catch (IOException e) {
+        }
+        try {
+            imgPretas = ImageIO.read(getClass().getClassLoader().getResource("img/preta.jpg"));
+    	} catch (IOException e) {
+        }
+        try {
+            imgFundoBranca = ImageIO.read(getClass().getClassLoader().getResource("img/fundo_branco.jpg"));
+    	} catch (IOException e) {
+        }
+        try {
+            imgFundoPreta = ImageIO.read(getClass().getClassLoader().getResource("img/fundo_escuro.jpg"));
+    	} catch (IOException e) {
+        }
+        
 		JButton bt = null;
 		boolean tipo = true;
 		
@@ -124,6 +125,7 @@ public class Tabuleiro extends Frame {
 	}
 	
 	public void setSuaVez(boolean s) {
+    	this.setTitle("Jogo Reversi - Player "+client.getPlayer()+(s?" - Sua Vez":""));
 		this.suaVez = s;
 	}
 	

@@ -21,3 +21,12 @@ O lado cliente deverá:
 Na Seção 2 tem-se uma breve descrição do jogo e alguns exemplos de jogada. A descrição do jogo e os exemplos de jogadas foram obtidos do endereço:
 http://othelloclassic.blogspot.com.br/2010/06/regras-do-jogo.html.
 Já no endereço http://www.othelloonline.org/reversi.php tem-se uma versão online do jogo.
+
+
+Utilização:
+
+Servidor:
+java server.Server
+
+Cliente:
+java client.Client [ip do servidor]

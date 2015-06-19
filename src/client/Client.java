@@ -20,9 +20,9 @@ public class Client {
 		
 	}
 	
-	public void start() {
+	public void start(String ip) {
 		try{
-			this.server = new Socket("192.168.2.103", Server.PORT);
+			this.server = new Socket(ip, Server.PORT);
 			
 			//recebe o id do player
 			ObjectInputStream in = new ObjectInputStream(this.server.getInputStream());
@@ -42,7 +42,7 @@ public class Client {
 			}
 			
 			//carrega interface
-			this.tab = new Tabuleiro(this.player_id);
+			this.tab = new Tabuleiro();
 			this.tab.setClient(this);
 			this.tab.doChanges(arr);
 			this.tab.setVisible(true);
@@ -52,13 +52,26 @@ public class Client {
 				in = new ObjectInputStream(this.server.getInputStream());
 				try {
 					int player = (int) in.readObject();
-					if (player <= 2) {
+					System.out.println(player);
+					if (player == Piece.PLAYER_1 || player == Piece.PLAYER_2) {
 						//atualiza o player que vai jogar
 						this.tab.setSuaVez(player == this.player_id);
 					} else {
 						//recebe o player que ganhou ou perdeu
 						if (player == this.player_id + 2) {
 							JOptionPane.showMessageDialog(this.tab, "Você ganhou", "Fim de jogo", JOptionPane.INFORMATION_MESSAGE);
+							break;
+						//verifica se player nao possui jogada disponivel
+						} else if (player >= 5 && player <= 6) {
+							if (player == this.player_id + 4) {
+								JOptionPane.showMessageDialog(this.tab, "Você não possui jogada disponível, aguardo outro jogador", "", JOptionPane.INFORMATION_MESSAGE);
+								this.tab.setSuaVez(false);
+							} else {
+								JOptionPane.showMessageDialog(this.tab, "Outro jogador não possui jogada, jogue outra vez", "", JOptionPane.INFORMATION_MESSAGE);
+								this.tab.setSuaVez(true);
+							}
+						} else if (player == -1) {
+							JOptionPane.showMessageDialog(this.tab, "Empatou", "Fim de jogo", JOptionPane.INFORMATION_MESSAGE);
 							break;
 						} else {
 							JOptionPane.showMessageDialog(this.tab, "Você perdeu", "Fim de jogo", JOptionPane.INFORMATION_MESSAGE);
@@ -78,18 +91,6 @@ public class Client {
 					e.printStackTrace();
 				}
 
-				/*
-				 * ver erro
-				 * java.io.EOFException
-	at java.io.ObjectInputStream$PeekInputStream.readFully(ObjectInputStream.java:2325)
-	at java.io.ObjectInputStream$BlockDataInputStream.readShort(ObjectInputStream.java:2794)
-	at java.io.ObjectInputStream.readStreamHeader(ObjectInputStream.java:801)
-	at java.io.ObjectInputStream.<init>(ObjectInputStream.java:299)
-	at client.Client.start(Client.java:73)
-	at client.Client.main(Client.java:105)
-				 * 
-				 */
-				
 			}
 			
 			this.server.close();
@@ -112,9 +113,22 @@ public class Client {
 		}
 	}
 	
+	public int getPlayer()
+	{
+		return this.player_id;
+	}
+	
 	public static void main(String[] args) {
+		String ip = "127.0.0.1";
+		if (args.length > 0) {
+			ip = args[0];
+		}
 		Client c = new Client();
-		c.start();
+		c.start(ip);
+		
+		//teste
+//		Tabuleiro tab = new Tabuleiro(1);
+//		tab.setVisible(true);
 	}
 
 }
