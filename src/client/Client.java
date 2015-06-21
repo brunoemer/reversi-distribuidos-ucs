@@ -52,7 +52,6 @@ public class Client {
 				in = new ObjectInputStream(this.server.getInputStream());
 				try {
 					int player = (int) in.readObject();
-					System.out.println(player);
 					if (player == Piece.PLAYER_1 || player == Piece.PLAYER_2) {
 						//atualiza o player que vai jogar
 						this.tab.setSuaVez(player == this.player_id);
@@ -125,10 +124,6 @@ public class Client {
 		}
 		Client c = new Client();
 		c.start(ip);
-		
-		//teste
-//		Tabuleiro tab = new Tabuleiro(1);
-//		tab.setVisible(true);
 	}
 
 }

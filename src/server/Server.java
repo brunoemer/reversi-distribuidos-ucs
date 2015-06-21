@@ -25,11 +25,11 @@ public class Server {
 				this.board[i][j] = 0;
 				
 				//teste
-				if(!((i == 1 && j == 2) || (i == 3 && j == 5) || (i == 3 && j == 1))){
-					Piece p = new Piece(j, i, i%2==0?Piece.PLAYER_1:Piece.PLAYER_1);
-					tab.add(p);
-					this.pieceToBoard(p);
-				}
+//				if(!((i == 1 && j == 2) || (i == 3 && j == 5) || (i == 3 && j == 1))){
+//					Piece p = new Piece(j, i, i%2==0?Piece.PLAYER_1:Piece.PLAYER_1);
+//					tab.add(p);
+//					this.pieceToBoard(p);
+//				}
 			}
 		}
 		
@@ -299,7 +299,6 @@ public class Server {
 			for (int x = 0; x < Server.LENGTH; x++) {
 				if (this.getPlayerBoard(x, y) == 0) {
 					tab = this.getChanges(new Piece(x, y, player));
-					System.out.println(x+"-"+y);
 					if (tab.size() > 0) {
 						hasPlay = true;
 						break;
@@ -314,7 +313,6 @@ public class Server {
 				for (int x = 0; x < Server.LENGTH; x++) {
 					if (this.getPlayerBoard(x, y) == 0) {
 						tab = this.getChanges(new Piece(x, y, other_player));
-						System.out.println(tab);
 						if (tab.size() > 0) {
 							hasPlay2 = true;
 							break;
@@ -327,9 +325,6 @@ public class Server {
 			}
 		}
 
-		System.out.println(hasPlay);
-		System.out.println(hasPlay2);
-		System.out.println(pwin);
 		if (!hasPlay && !hasPlay2) {
 			int p1 = 0, p2 = 0;
 			for (int y = 0; y < Server.LENGTH; y++) {
@@ -455,6 +450,8 @@ public class Server {
 						player_check = this.checkPlay(current_player);
 						if (player_check == 0) {
 							player_check = current_player;
+						} else if (player_check >= 5 && player_check <= 6) {
+							current_player = this.getNextPlayer(current_player);
 						}
 					}
 
