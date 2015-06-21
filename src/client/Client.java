@@ -95,6 +95,7 @@ public class Client {
 			this.server.close();
 		}catch(IOException e){
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(this.tab, "Erro na conexão com servidor", "Erro", JOptionPane.ERROR_MESSAGE);
 		}
 
 		System.exit(0);
